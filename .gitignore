@@ -13,6 +13,11 @@
 
 # Ignore the built binary
 cert-manager-webhook-example
+cert-manager-webhook-namesilo
+
+# Ignore actual test data files with sensitive information
+testdata/namesilo/config.json
+testdata/namesilo/namesilo-credentials.y*ml
 
 # Make artifacts
 _out

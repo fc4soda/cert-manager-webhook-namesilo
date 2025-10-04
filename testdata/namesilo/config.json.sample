@@ -1,0 +1,8 @@
+
+{
+  "username": "<Namesilo.com username>",
+  "apiTokenSecretRef": {
+    "Name": "namesilo-credentials",
+    "Key": "api-token"
+  }
+}
