@@ -77,6 +77,7 @@ type namesiloDNSProviderConfig struct {
 	// These fields will be set by users in the
 	// `issuer.spec.acme.dns01.providers.webhook.config` field.
 	Username          string                   `json:"username"`
+	IsSandbox         bool                     `json:"issandbox"`
 	ApiTokenSecretRef corev1.SecretKeySelector `json:"apitokensecret"`
 }
 
@@ -184,14 +185,19 @@ func (c *namesiloDNSProviderSolver) namesiloAPIClient(ch *v1alpha1.ChallengeRequ
 	if err != nil {
 		return nil, err
 	}
+
 	nc := namesilo.NewClient(apiToken)
-	// Set the endpoint to use the OTE endpoint.
-	endpoint, err := namesilo.GetEndpoint(false, true)
+	if cfg.IsSandbox {
+		// Set the endpoint to use the OTE endpoint.
+		nc.Endpoint, err = namesilo.GetEndpoint(false, true)
+		fmt.Println("isSandbox")
+	} else {
+		nc.Endpoint, err = namesilo.GetEndpoint(true, false)
+	}
 	if err != nil {
 		return nil, err
 	}
 
-	nc.Endpoint = endpoint
 	return nc, nil
 }
 
@@ -230,6 +236,7 @@ func (c *namesiloDNSProviderSolver) secret(ref corev1.SecretKeySelector, namespa
 // the typed config struct.
 func loadConfig(cfgJSON *apiextensionsv1.JSON) (namesiloDNSProviderConfig, error) {
 	cfg := namesiloDNSProviderConfig{}
+
 	// handle the 'base case' where no configuration has been provided
 	if cfgJSON == nil {
 		return cfg, nil
@@ -237,7 +244,6 @@ func loadConfig(cfgJSON *apiextensionsv1.JSON) (namesiloDNSProviderConfig, error
 	if err := json.Unmarshal(cfgJSON.Raw, &cfg); err != nil {
 		return cfg, fmt.Errorf("error decoding solver config: %v", err)
 	}
-
 	return cfg, nil
 }
 

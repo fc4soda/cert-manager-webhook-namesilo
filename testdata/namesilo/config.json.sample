@@ -1,6 +1,7 @@
 
 {
   "username": "<Namesilo.com username>",
+  "issandbox": false,
   "apiTokenSecretRef": {
     "Name": "namesilo-credentials",
     "Key": "api-token"
